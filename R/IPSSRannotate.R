@@ -22,10 +22,15 @@ IPSSRannotate <- function(patientResult,calculation='ALL') {
   
   if (!'CYTOVEC' %in% colnames(patientResult)) {
     # Cytogenetics as a numerical vector
-    patientResult$CYTOVEC <- car::recode(patientResult$CYTO_IPSSR,
-       "'Very Good'=0; 'Good'=1; 'Intermediate'=2; 'Poor'=3; 'Very Poor'=4",
-       as.factor = FALSE
-    )
+    
+    ##REMOVED car DEPENDENCY 2024-04-25
+    patientResult$CYTOVEC <- NA
+    patientResult$CYTOVEC[patientResult$CYTO_IPSSR=='Very Good'] <- 0
+    patientResult$CYTOVEC[patientResult$CYTO_IPSSR=='Good'] <- 1
+    patientResult$CYTOVEC[patientResult$CYTO_IPSSR=='Intermediate'] <- 2
+    patientResult$CYTOVEC[patientResult$CYTO_IPSSR=='Poor'] <- 3
+    patientResult$CYTOVEC[patientResult$CYTO_IPSSR=='Very Poor'] <- 4
+
   }
   
   # IPSSM score and cat unified results
