@@ -60,10 +60,13 @@ IPSSMprocess <- function(patientInput,
   patientProcess$TRANSF_PLT100 <- pmin(patientProcess$PLT, 250) / 100 # ceiling at 250
 
   # Cytogenetics as a numerical vector
-  patientProcess$CYTOVEC <- car::recode(patientProcess$CYTO_IPSSR,
-    "'Very Good'=0; 'Good'=1; 'Intermediate'=2; 'Poor'=3; 'Very Poor'=4",
-    as.factor = FALSE
-  )
+  ##REMOVED car DEPENDENCY 2024-04-25
+  patientProcess$CYTOVEC <- NA
+  patientProcess$CYTOVEC[patientProcess$CYTO_IPSSR=='Very Good'] <- 0
+  patientProcess$CYTOVEC[patientProcess$CYTO_IPSSR=='Good'] <- 1
+  patientProcess$CYTOVEC[patientProcess$CYTO_IPSSR=='Intermediate'] <- 2
+  patientProcess$CYTOVEC[patientProcess$CYTO_IPSSR=='Poor'] <- 3
+  patientProcess$CYTOVEC[patientProcess$CYTO_IPSSR=='Very Poor'] <- 4
 
   # Calculation of number of residual mutations Nres2
   # with generalization to allow some missing genes in the list of residual genes

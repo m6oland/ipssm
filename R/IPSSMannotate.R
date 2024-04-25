@@ -19,33 +19,50 @@
 #'
 IPSSMannotate <- function(patientResult, range.max = 1) {
   cat("Annotating IPSS-M results\n")
-
+  
   # IPSSM score and cat unified results
-  patientResult$IPSSMscore <- NA
-  patientResult$IPSSMcat <- NA
-  patientResult$Comment <- "range (worst - best) above limit"
-
+  patientResult$IPSSMscore <- patientResult$IPSSMscore_mean
+  patientResult$IPSSMcat <- as.vector(patientResult$IPSSMcat_mean)
+  patientResult$Comment <- NA
+  
   # Start by filling in for cases where the distance between best and worst IPSS-M risk score
   # is lower than the allowed maximan range
-  i <- which(patientResult$IPSSMscore_worst - patientResult$IPSSMscore_best <= range.max)
+  i <- which((patientResult$IPSSMscore_worst - patientResult$IPSSMscore_best <= range.max)&
+               as.vector(patientResult$IPSSMcat_worst) == as.vector(patientResult$IPSSMcat_best))
   if (length(i) > 0) {
-    patientResult$IPSSMscore[i] <- patientResult$IPSSMscore_mean[i]
-    patientResult$IPSSMcat[i] <- as.vector(patientResult$IPSSMcat_mean[i])
     patientResult$Comment[i] <- "range (worst - best) below limit"
   }
 
+  # Continue by filling in for cases where the distance between best and worst IPSS-M risk score
+  # is lower than the allowed maximan range but categories are different
+  ii <- which((patientResult$IPSSMscore_worst - patientResult$IPSSMscore_best <= range.max)&
+               as.vector(patientResult$IPSSMcat_worst) != as.vector(patientResult$IPSSMcat_best))
+  if (length(ii) > 0) {
+    patientResult$Comment[ii] <- "IPSS-M results less confident due to missing mutation data"
+  }
+ 
   # Continue with cases where the range is above limit
   # But the categories remain unchanged
   j <- which((patientResult$IPSSMscore_worst - patientResult$IPSSMscore_best > range.max) &
-    as.vector(patientResult$IPSSMcat_worst) == as.vector(patientResult$IPSSMcat_best))
+               as.vector(patientResult$IPSSMcat_worst) == as.vector(patientResult$IPSSMcat_best))
   if (length(j) > 0) {
-    patientResult$IPSSMcat[j] <- as.vector(patientResult$IPSSMcat_mean[j])
     patientResult$Comment[j] <- "range (worst - best) above limit, but stable category"
   }
-
+  
+  # Continue with cases where the range is above limit
+  # Return warning when the categories change
+  jj <- which((patientResult$IPSSMscore_worst - patientResult$IPSSMscore_best > range.max) &
+                as.vector(patientResult$IPSSMcat_worst) != as.vector(patientResult$IPSSMcat_best))
+  if (length(jj) > 0) {
+    patientResult$Comment[jj] <- "IPSS-M results less confident due to missing mutation data"
+  }
+  
+  
   # Change the label when no uncertainty
   k <- which(patientResult$IPSSMscore_worst - patientResult$IPSSMscore_best == 0)
-  patientResult$Comment[k] <- "no uncertainty (no missing data)"
-
+  if (length(k) > 0) {
+    patientResult$Comment[k] <- "no uncertainty (no missing data)"
+  }
+  
   return(patientResult)
 }

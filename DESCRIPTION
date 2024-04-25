@@ -1,21 +1,20 @@
 Package: ipssm
 Type: Package
 Title: Molecular International Prognosis Scoring System For Myelodysplastic Syndromes
-Version: 1.0.0
+Version: 1.0.1
 Authors@R:
     person(given = "Elsa",
            family = "Bernard",
            role = c("aut", "cre"),
            email = "bernardelsa@gmail.com",
            comment = c(ORCID = "0000-0002-2057-7187"))
-Description: This package calculates the IPSS-M risk score and risk categories from MDS patients clinical and molecular profiles.
+Description: This package calculates the IPSS-M risk score and risk categories from MDS patients clinical and molecular profiles. This is a fork of the original library to add support for reading dataframes and provided survival stats for IPSS-M & IPSS-R calculators.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.3.1
 Imports:
-    car,
     readxl
 Suggests:
     knitr,
